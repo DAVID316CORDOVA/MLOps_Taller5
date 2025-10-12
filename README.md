@@ -256,7 +256,7 @@ docker compose docker-compose-locust up
 
 
 ### 2. Primera prueba con todos los recursos disponibles
-![Inicio del sistema](.imagenes/Recursos%20completos.jpg)
+![Inicio del sistema](./imagenes/Recursos%20completos.jpg)
 
 ### 3. 1ra disminución de recursos (2cpu 4ram)
 ![Inicio del sistema](./imagenes/2cpu_4ram.png)
