@@ -253,7 +253,9 @@ docker compose docker-compose-locust up
 ## Ejecución del Proyecto
 
 ### 1. Despliegue de servicios necesarios (MLflow, FastAPI, Locust)
-
+![Inicio del sistema](./imagenes/dockerhub.jpg)
+![Inicio del sistema](./imagenes/mlflow.png)
+![Inicio del sistema](./imagenes/locust.jpg)
 
 ### 2. Primera prueba con todos los recursos disponibles
 ![Inicio del sistema](./imagenes/Recursos%20completos.jpg)
@@ -274,14 +276,7 @@ docker compose docker-compose-locust up
 ## 7. 5ta disminución de recursos(0.75cpu 0.256ram) - Fallo
 ![Inicio del sistema](./imagenes/0_5_cpu_256mb_ram.png)
 
-## 7. Validación de experimentos creados 
-![Inicio del sistema](./imagenes/experimentos.png)
 
-## 8. Revisión de accuraccy
-![Inicio del sistema](./Imagenes/Accuracy.png)
-
-## 9. inferencia en FastAPI una vez creado el modelo
-![Inicio del sistema](./imagenes/Inferencia_fastapi.png)
 
 ### funciones notebook - Lógica del Pipeline
 
