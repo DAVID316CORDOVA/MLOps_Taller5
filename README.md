@@ -137,9 +137,6 @@ requirements.txt
 # environment:
       - LOCUST_HOST=http://10.43.100.98:8000
 ```
-
-
-
 ## Flujo del Pipeline
 
 ### Secuencia de Ejecución:
@@ -255,33 +252,36 @@ docker compose docker-compose-locust up
 
 ## Ejecución del Proyecto
 
-### 1. Creación del entorno virtual
-![Inicio del sistema](./Imagenes/imagen1.png)
-
-### 2. Despliegue entorno virtual
-![Inicio del sistema](./Imagenes/imagen2.png)
-
-### 3. Instalación de librerías necesarias para Mlflow
-![Inicio del sistema](./Imagenes/imagen3.png)
-
-## 4. Levantamiento de docker compose
-![Inicio del sistema](./Imagenes/imagen5.png)
-
-## 5. Levantamiento Mlflow 
-![Inicio del sistema](./Imagenes/imagen6.png)
+### 1. Despliegue de servicios necesarios (MLflow, FastAPI, Locust)
 
 
-## 6. Ejecución de notebook en jupyter
-![Inicio del sistema](./Imagenes/imagen8.png)
+### 2. Primera prueba con todos los recursos disponibles
+![Inicio del sistema](.imagenes/Recursos%20completos.jpg)
+
+### 3. 1ra disminución de recursos (2cpu 4ram)
+![Inicio del sistema](./imagenes/2cpu_4ram.png)
+
+## 4. 2da disminución de recursos (1.5cpu 3ram)
+![Inicio del sistema](./imagenes/1_5_de_cpu_3_ram.png)
+
+## 5. 3ra disminución de recursos (1cpu 2ram) 
+![Inicio del sistema](./imagenes/1_cpu_2_ram.png)
+
+
+## 6. 4ta disminución de recursos(0.75cpu 1ram)
+![Inicio del sistema](./imagenes/0_75_cpu_4_ram.png)
+
+## 7. 5ta disminución de recursos(0.75cpu 0.256ram) - Fallo
+![Inicio del sistema](./imagenes/0_5_cpu_256mb_ram.png)
 
 ## 7. Validación de experimentos creados 
-![Inicio del sistema](./Imagenes/experimentos.png)
+![Inicio del sistema](./imagenes/experimentos.png)
 
 ## 8. Revisión de accuraccy
 ![Inicio del sistema](./Imagenes/Accuracy.png)
 
 ## 9. inferencia en FastAPI una vez creado el modelo
-![Inicio del sistema](./Imagenes/Inferencia_fastapi.png)
+![Inicio del sistema](./imagenes/Inferencia_fastapi.png)
 
 ### funciones notebook - Lógica del Pipeline
 
