@@ -1,42 +1,51 @@
-# MLOps Taller 4 - Despliegue de servicio de MLFlow #
+# MLOps Taller 5 - Locust con MLflow #
 
 **Grupo compuesto por Sebastian Rodríguez y David Córdova**
 
-Este proyecto implementa múltiples servicios con el fin de lograr desplegar una instancia de Mlflow, utilizando los siguientes servicios:  MySQL, Jupyter, MiniIO, Postgres y FastAPI
+Este proyecto implementa una metodología de pruebas de estres a una API que toma un modelo desde MLflow.
 
 ## Características Principales
 
-- **Arquitectura híbrida MLOps**: MLFlow server en host con infraestructura de soporte containerizada
+- **Arquitectura  MLOps**: Despliegue de MLflow mediante contenedores.
 - **Pipeline completo de ML**: Desde ingesta de datos hasta inferencia en producción con trazabilidad completa
 - **Storage multi-capa especializado**:
   - Postgres para metadata de experimentos y modelos MLFlow
-  - MySQL para datasets de entrenamiento y aplicación
   - MinIO como S3-compatible para artefactos (modelos, plots, logs)
 - **Contenerización orquestada**: Docker Compose gestiona toda la infraestructura de servicios
-- **Entorno integrado de desarrollo**: Jupyter con conectividad directa a todas las fuentes de datos
 - **API de producción**: FastAPI consume modelos directamente desde MLFlow Registry
 - **Tracking y versionado automático**: Experimentos, métricas y modelos registrados automáticamente
 - **Configuración S3 local**: MinIO simula AWS S3 para desarrollo y testing
+- **Locust**: App utilizada para generar tráfico en la API y validad capacidad de respuesta 
 
 ## Estructura del Proyecto
 
 ```
-MLOps_Taller4/
-├── fastapi/
-│   ├── __pycache__/
-│   ├── Dockerfile
-│   ├── main.py
-│   └── requirements.txt
-├── minio/
-├── Notebooks/
-├── Venv/
-├── images/
-├── work
-├── docker-compose.yaml
-└── README.md
-└──Dockerfile
-└──Requirement.txt
+fastapi/
+├── Dockerfile
+├── main.py
+└── requirements.txt
 
+locust/
+├── locustfile.py
+└── requirements-locust.txt
+
+minio/
+
+ml-training/
+├── Dockerfile
+├── requirements.txt
+└── train_model.py
+
+mlflow/
+
+register_model/
+├── RegresionLogistica.pkl
+└── wait_and_run.sh
+
+docker-compose-locust.yaml
+docker-compose.yaml
+RegresionLogistica.pkl
+requirements.txt
 ```
 
 ### Descripción de Componentes
@@ -54,37 +63,35 @@ MLOps_Taller4/
   - **Contenido**: Modelos serializados, plots, logs y metadata de experimentos
   - **Acceso**: S3-compatible storage accesible desde Jupyter y MLFlow server
 
-- **venv/**:
-  - **Propósito**: Ambiente virtual Python para MLFlow server en host
-  - **Librerías**: mlflow, awscli, boto3, psycopg2-binary para conexiones completas
-  - **Función**: Aislamiento de dependencias del tracking server
-
-- **work/**:
-  - **Contenido**: Notebooks Jupyter con pipeline completo de ML
-  - **Mount**: Volume compartido entre host y container Jupyter
-  - **Acceso**: Persistencia de código y resultados de experimentación
-
 - **images/**:
   - **Propósito**: Documentación visual del proyecto
   - **Contenido**: Screenshots de interfaces, evidencias de funcionamiento
+  - **Uso**: Soporte para README y documentación técnica
+- **locust/**:
+  - **función**: alojar el .py que despliega la estructura de inferencia de locust 
+  **requirements**: librerías necesarias para desplegar locust
   - **Uso**: Soporte para README y documentación técnica
 
 **Configuración de orquestación:**
 
 - **docker-compose.yaml**:
-  - **Servicios gestionados**: MinIO, MySQL, Postgres, Jupyter, FastAPI
+  - **Servicios gestionados**: MinIO, Postgres, FastAPI, Mlflow
   - **Networking**: Red interna para comunicación inter-servicios
-  - **Volúmenes persistentes**: mysql_data, postgres_data para persistencia
+  - **Volúmenes persistentes**: postgres_data para persistencia
   - **Variables de entorno**: Configuración S3, credenciales y URIs de conexión
   - **Dependencias**: Orden de inicio optimizado para disponibilidad de servicios
+
+  - **docker-compose-locust.yaml**:
+  - **Servicios gestionados**:locust
+  - **Dependencias**: FastAPI
 
 **Servicios containerizados:**
 
 - **MinIO Container**: S3-compatible storage (puertos 9000/9001)
-- **MySQL Container**: Base de datos para datasets y aplicación (puerto 3306)
 - **Postgres Container**: Backend store MLFlow metadata (puerto 5432)
-- **Jupyter Container**: Entorno desarrollo ML con acceso completo a datos
 - **FastAPI Container**: API producción conectada a MLFlow registry (puerto 8000)
+- **ml-Training Container**: Contenedor que permite la ejecución de .py que genera un modelo de ML y lo pasa a producción en Mlflow de manera automática
+- **Locust Container**: Contenedor en donde se ejecuta Locust para realizar las pruebas de tráfico, depende del despliegue del contenedor de FastAPI
 
 
 
@@ -93,16 +100,10 @@ MLOps_Taller4/
 ### ¿Por qué esta configuración?
 
 **Problema original:**
-- Por defecto toda la metadata de MLflow se almacena en SQLite, inadecuado para entornos de producción
-- Se requiere una base de datos robusta para almacenar datasets de entrenamiento y tablas de aplicación
-- Necesidad de storage escalable para artefactos de ML (modelos, plots, logs)
-- FastAPI debe poder consumir modelos directamente desde MLflow Registry
+- Se requiere saber cual es la mínima capacidad necesaria para poder soportar 10000 usuarios haciendo request, de igual manera evaluar cómo la generación de réplicas puede optimizar el proceso, al ser el foco del taller, se buscó automatizar por completo el consumo del modelo para enfocarse en la optimización de request.
 
 **Solución implementada:**
-- **Postgres** como backend store para metadata de MLflow (experimentos, runs, modelos)
-- **MySQL** como base de datos principal para datasets y tablas de aplicación
-- **MinIO** como S3-compatible storage para artefactos de MLflow
-- **Configuración de red** que permite comunicación directa entre todos los servicios
+- Se realizaron múltiples experimentos reduciendo la capacidad de los recursos que puede tomar el contenedor de FastAPI, posteriormente se generaron réplicas para evaluar el desempeño de la API
 
 ### Componentes de Configuración
 
@@ -113,13 +114,6 @@ MLOps_Taller4/
 **Función:** realiza la conexión entre FastAPI y Mlflow.
 ```
 
-**Servicio de despligue Mlflow:**
-```python -m mlflow server \
-  --backend-store-uri postgresql://mlflow_user:mlflow_password@localhost:5432/mlflow_db \
-  --default-artifact-root s3://mlflows3/artifacts \
-  --host 0.0.0.0 --port 5005 --serve-artifacts
-    "
-```
 
 ### Docker Compose maneja automáticamente:
 - Creación de redes internas
@@ -130,29 +124,18 @@ MLOps_Taller4/
 
 ## Conexiones Configuradas
 
-###  MySQL - Conexión entre Jupyter y MySQL mediante la librería MySQLdb
-```yaml
-MySQLdb.connect(
-    host="mysql",          
-    user="my_app_user",
-    passwd="my_app_pass",  
-    db="my_app_db",
-    port=3306
-````
-
-
 ### Conexión de FastAPI con Mlflow
 
 ```yaml
 # Tracking server de MLflow
-        mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5005"))
+        mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
 ```
 * Genera la conexión directa entre ambos servicios para poder generar la inferencia desde fastAPI tomando los modelos que vayamos desplegando en producción desde Mlflow
-### Despliegue de Mlflow con backend en Postgres
+### Conexión de Locust a FastAPI
 
 ```yaml
-# Conexión Postgres
---backend-store-uri postgresql://mlflow_user:mlflow_password@localhost:5432/mlflow_db\
+# environment:
+      - LOCUST_HOST=http://10.43.100.98:8000
 ```
 
 
@@ -162,49 +145,31 @@ MySQLdb.connect(
 ### Secuencia de Ejecución:
 
 1. docker compose up
-2. Servicios iniciando (Minio + mysql + Postgres + Jupyter + Fastapi )
-3. Mlflow en entorno virtual
-4. Correr el notebook principal en Jupyter
-5. Validar experimentos y modelos en Mlflow
-6. Realizar inferencia en Mlflow
+2. Servicios iniciando (Minio+ Postgres + MlFlow + Fastapi + Python Env)
+3. docker compose docker-compose-locust up
+4. Servicio de Locust iniciado.
+5. Definir parámetros de pruebas de estes 
+6. Realizar pruebas de estres reduciendo capacidad hasta llegar al mínimo posible 
 
 
-## Explicación Notebook (ejecucion.ipynb)
+## Explicación train_model-py (ejecucion.ipynb)
 
 Este notebook tiene todo el flujo correspondiente a la ingesta de información, entrenamiento, experimentos y paso a producción del modelo
 
 1. **Preparación de la base de datos**
-   - Elimina tablas previas (`penguins_raw` y `penguins_clean`) si existen.
-   - Crea las tablas necesarias para datos crudos y limpios.
+   - Crea el Df de palmerpenguins
 
 2. **Carga y limpieza de datos**
-   - Inserta datos de pingüinos en la tabla `penguins_raw`.
-   - Limpia y transforma los datos (One-Hot Encoding, manejo de NaN) y los inserta en `penguins_clean`.
+   - Limpia y transforma los datos (One-Hot Encoding, manejo de NaN) 
 
-3. **generación de experimentos**
-   - Usa los datos limpios para generar múltiples experimentos con diferentes experimentos
-   - Guarda todos los logs en Mlflow junto con los modelos 
+3. **Entrenamiento del modelo**
+   - Guarda todos los logs del experimento en 
 
 4. **Paso a producción del modelo seleccionado**
    - Se ejecuta un comando para que Mlflow ponga el modelo seleccionado en producción y pueda ser consumido por la API
 
 
-### Resumen del flujo
 
-```
-delete_table + delete_table_clean
-         ↓
-  create_table_raw
-         ↓
- create_table_clean
-         ↓
-   insert_data
-         ↓
-    read_data
-         ↓
-   Experiments
-         ↓
-    production_model
 
 ```
 
