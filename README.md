@@ -169,6 +169,35 @@ Este notebook tiene todo el flujo correspondiente a la ingesta de información, 
    - Se ejecuta un comando para que Mlflow ponga el modelo seleccionado en producción y pueda ser consumido por la API
 
 
+**Configuración FastAPI**
+
+Framework: FastAPI v3.0.0
+Propósito: Predecir especies de pingüinos (Adelie, Chinstrap, Gentoo)
+Optimizado para baja latencia y alta concurrencia
+
+**Modelo de datos (PenguinFeatures)**
+Recibe 10 características del pingüino:
+
+Medidas físicas: longitud/profundidad del pico, longitud de aleta, masa corporal
+Variables categóricas: año, isla (Biscoe/Dream/Torgersen), sexo (female/male)
+Todas con validación (valores >= 0)
+
+**Carga del modelo (startup)**
+
+Conecta con MLflow para descargar el modelo
+Usa MinIO como storage backend (S3-compatible)
+Carga el modelo reg_logistica en estado Production
+Cachea el modelo en memoria para predicciones instantáneas
+Ejecuta un test de predicción inicial para validar funcionamiento
+
+**Endpoints**
+
+POST /predict: Recibe características, retorna especie predicha con latencia <10ms
+GET /health: Estado del servicio y modelo
+GET /model-info: Información técnica del modelo cacheado
+
+**Ventaja clave**:
+El modelo se carga una sola vez en memoria al iniciar, eliminando el overhead de MLflow en cada predicción. Esto permite latencias ultra-bajas (<10ms) ideal para producción de alto tráfico.
 
 
 ```
