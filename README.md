@@ -100,10 +100,10 @@ requirements.txt
 ### ¿Por qué esta configuración?
 
 **Problema original:**
-- Se requiere saber cual es la mínima capacidad necesaria para poder soportar 10000 usuarios haciendo request, de igual manera evaluar cómo la generación de réplicas puede optimizar el proceso, al ser el foco del taller, se buscó automatizar por completo el consumo del modelo para enfocarse en la optimización de request.
+- Se requiere saber cual es la mínima capacidad necesaria para poder soportar 10000 usuarios haciendo request, de igual manera evaluar cómo la generación de réplicas puede optimizar el proceso, al ser el foco del taller, se buscó automatizar por completo el consumo del modelo para enfocarse en la optimización de request. Adicional, se busca consumir una imagen desde Dockerhub para el despliegue de la API
 
 **Solución implementada:**
-- Se realizaron múltiples experimentos reduciendo la capacidad de los recursos que puede tomar el contenedor de FastAPI, posteriormente se generaron réplicas para evaluar el desempeño de la API
+- Se construyó la imagen del FastAPI y se subio a Dockerhub, una vez en Dockerhub se ajustó el docker compose para consumir esa imagen directamente y desplegar el servicio.Adicionalmente, se realizaron múltiples experimentos reduciendo la capacidad de los recursos que puede tomar el contenedor de FastAPI, posteriormente se generaron réplicas para evaluar el desempeño de la API. Adicionalmente
 
 ### Componentes de Configuración
 
@@ -148,13 +148,13 @@ requirements.txt
 2. Servicios iniciando (Minio+ Postgres + MlFlow + Fastapi + Python Env)
 3. docker compose docker-compose-locust up
 4. Servicio de Locust iniciado.
-5. Definir parámetros de pruebas de estes 
+5. Definir parámetros de pruebas de estres 
 6. Realizar pruebas de estres reduciendo capacidad hasta llegar al mínimo posible 
 
 
-## Explicación train_model-py (ejecucion.ipynb)
+## Explicación train_model-py (ejecucion.py)
 
-Este notebook tiene todo el flujo correspondiente a la ingesta de información, entrenamiento, experimentos y paso a producción del modelo
+Este script tiene todo el flujo correspondiente a la ingesta de información, entrenamiento, experimentos y paso a producción del modelo
 
 1. **Preparación de la base de datos**
    - Crea el Df de palmerpenguins
@@ -213,13 +213,13 @@ Se obtiene un modelo de clasificación entrenado y validado automáticamente, li
 
 ```bash
 # Clonar el repositorio
-git clone (https://github.com/spartron12/MLOps_Taller4)
-cd MLOps_Taller4
+git clone (https://github.com/DAVID316CORDOVA/MLOps_Taller5)
+cd MLOps_Taller5
 
 # Limpiar entorno previo (si existe)
 docker compose down -v
 docker system prune -f
-pkill -f "mlflow server" #Limpia todas las instancias de mflow creadas
+
 ```
 
 ### Ejecución 
@@ -229,27 +229,16 @@ pkill -f "mlflow server" #Limpia todas las instancias de mflow creadas
 docker compose up
 ```
 ```bash
-# Generar el entorno virtual junto con las librerías necesarias para ejecutar Mlflow:
-python3 -m venv venv
-pip install mlflow awscli boto3 psycopg2-binary
-```
-```bash
-# Generar el entorno virtual junto con las librerías necesarias para ejecutar Mlflow:
-python3 -m venv venv
-pip install mlflow awscli boto3 psycopg2-binary
-python -m mlflow server \
-  --backend-store-uri postgresql://mlflow_user:mlflow_password@localhost:5432/mlflow_db \
-  --default-artifact-root s3://mlflows3/artifacts \
-  --host 0.0.0.0 --port 5005 --serve-artifacts
-    "
+#Levantar el servicio de Locust
+docker compose docker-compose-locust up
 ```
 
 
 **Qué sucede**
 - Se crean todos los contenedores necesarios
-- Se despliega una instancia en Jupyter en donde debemos ejecutar el notebook 
-- Se guardan los modelos en Mlflow
+- Se entrena el modelo, se carga y pasa a producción en MLflow de manera automática
 - La API consume los modelos para hacer la inferencia
+- Se carga el Locust para poder realizar las pruebas de estrés
 
 
 
@@ -259,10 +248,9 @@ python -m mlflow server \
 |----------|-----|--------------|-------------|
 | **Mlflow Web** | http://localhost:5005 | admin/admin | Dashboard del pipeline |
 | **FastAPI Docs** | http://localhost:8000/docs | - | API de predicciones |
-| **MySQL** | localhost:3306 | my_app_user/my_app_pass | Base de datos |
-| **Jupyter** | http://localhost:8888 | - | Jupyter Notebook |
 | **Postgres** | http://localhost:5432 | mlflow_user:mlflow_password | Postgres|
-| **Minio** | http://localhost:9000 | admin:supersecret | Postgres|
+| **Minio** | http://localhost:9000 | admin:supersecret | |
+| **Locust** | http://localhost:8089 |  | App de pruebas |
 
 
 ## Ejecución del Proyecto
