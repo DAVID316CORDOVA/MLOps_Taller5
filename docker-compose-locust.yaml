@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  locust:
+    image: locustio/locust:2.29.1
+    container_name: locust
+    ports:
+      - "8089:8089"  # interfaz web
+    environment:
+      - LOCUST_HOST=http://10.43.100.83:8000  # el host objetivo (FastAPI)
+    volumes:
+      - ./locust:/mnt/locust              # carpeta local con tu locustfile.py
+    command: >
+      -f /mnt/locust/locustfile.py
+      --web-host=0.0.0.0
