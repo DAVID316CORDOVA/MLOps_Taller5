@@ -136,7 +136,7 @@ requirements.txt
 # Tracking server de MLflow
         mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000"))
 ```
-* Genera la conexión directa entre ambos servicios para poder generar la inferencia desde fastAPI tomando los modelos que vayamos desplegando en producción desde Mlflow
+* Genera la conexión directa entre ambos servicios para poder generar la inferencia desde fastAPI tomando el modelo que vayamos desplegando en producción desde Mlflow
 ### Conexión de Locust a FastAPI
 
 ```yaml
@@ -239,7 +239,7 @@ docker compose docker-compose-locust up
 **Qué sucede**
 - Se crean todos los contenedores necesarios
 - Se entrena el modelo, se carga y pasa a producción en MLflow de manera automática
-- La API consume los modelos para hacer la inferencia
+- La API consume el modelo para hacer la inferencia
 - Se carga el Locust para poder realizar las pruebas de estrés
 
 
