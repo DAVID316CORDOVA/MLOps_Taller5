@@ -531,5 +531,5 @@ En general, este proyecto evidencia la viabilidad y relevancia de aplicar práct
 - Sebastian Rodríguez  
 - David Córdova
 
-**Proyecto:** MLOps Taller 4 - Mlflow
-**Fecha:** Septiembre 2025
+**Proyecto:** MLOps Taller 5 - Locust
+**Fecha:** Octubre 2025
