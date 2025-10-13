@@ -65,7 +65,7 @@ model.fit(X_train, y_train)
 # ============================================================
 # 4. Loguear y registrar el modelo en MLflow
 # ============================================================
-print("📝 Registrando modelo en MLflow...")
+print("Registrando modelo en MLflow...")
 with mlflow.start_run(run_name="logistic_regression_run") as run:
     # Registrar métricas
     y_pred = model.predict(X_test)
@@ -85,7 +85,7 @@ with mlflow.start_run(run_name="logistic_regression_run") as run:
 # ============================================================
 # 5. Promover el modelo a Producción
 # ============================================================
-print("🚀 Promoviendo modelo a Production...")
+print("Promoviendo modelo a Production...")
 client = MlflowClient()
 
 model_name = "reg_logistica"
