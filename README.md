@@ -255,7 +255,7 @@ docker compose docker-compose-locust up
 ### 1. Despliegue de servicios necesarios (MLflow, FastAPI, Locust)
 ![Inicio del sistema](./imagenes/dockerhub.jpg)
 ![Inicio del sistema](./imagenes/mlflow.png)
-![Inicio del sistema](./imagenes/locust.jpg)
+![Inicio del sistema](./imagenes/locust_1000.jpg)
 
 ### 2. Primera prueba con todos los recursos disponibles
 ![Inicio del sistema](./imagenes/Recursos%20completos.jpg)
