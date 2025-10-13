@@ -538,6 +538,27 @@ def model_info():
     }
 ```
 
+## Comparación 1 instancia vs múltiples instancias 
+
+## 1 Instancia
+![Inicio del sistema](./imagenes/0_5_cpu_512_ram.png)
+
+## 3 Instancias
+![Inicio del sistema](./imagenes/3-replicas.png)
+
+# Análisis
+Escalar horizontalmente (más réplicas) permite distribuir la carga de solicitudes entre múltiples instancias de la API, lo que mejora significativamente la capacidad de respuesta, reduce la latencia promedio y los picos en percentiles altos y aumenta el RPS máximo sostenido sin fallos. En cambio, con una sola réplica, el sistema se satura antes, ya que todos los usuarios concurrentes se dirigen a un único contenedor.
+
+## ¿Es posible reducir más los recursos?
+No sería recomendable. Con una sola réplica, los tiempos de respuesta ya se vuelven muy altos y la capacidad se reduce a la mitad. Los recursos actuales con 3 réplicas parecen el mínimo viable para mantener buena estabilidad y tiempos aceptables.
+
+## ¿Cuál es la mayor cantidad de peticiones soportadas?
+Con 3 réplicas se alcanzaron alrededor de 600 RPS estables y 10.000 usuarios concurrentes sin fallas ni colapsos visibles.
+
+## ¿Qué diferencia hay entre una o múltiples instancias?
+Una réplica: menor rendimiento, alta latencia, saturación rápida.
+Múltiples réplicas: distribución de carga, menor latencia, mayor throughput, mejor escalabilidad.
+
 
 
 ## Conclusiones
