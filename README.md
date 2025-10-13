@@ -257,6 +257,22 @@ docker compose docker-compose-locust up
 ![Inicio del sistema](./imagenes/mlflow.png)
 ![Inicio del sistema](./imagenes/locust_1000.jpg)
 
+### 2.Evaluación de Recursos Disponibles para los Experimentos
+**Resultados:**
+
+![Memoria RAM](./imagenes/free-h.png)
+![CPU Info](./imagenes/lscpu.png)
+
+**Resumen:**
+- Memoria RAM: 15 GiB  
+- Swap: 4 GiB  
+- CPU: 4 núcleos Intel Xeon (2.40 GHz)  
+- Sistema operativo: Rocky Linux
+
+
+
+
+
 ### 2. Primera prueba con todos los recursos disponibles
 ![Inicio del sistema](./imagenes/Recursos%20completos.jpg)
 
