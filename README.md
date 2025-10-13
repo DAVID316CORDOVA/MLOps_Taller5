@@ -59,7 +59,7 @@ requirements.txt
 - **minio/**:
   - **Función**: Volume mount para almacenamiento persistente de artefactos MLFlow
   - **Contenido**: Modelos serializados, plots, logs y metadata de experimentos
-  - **Acceso**: S3-compatible storage accesible desde Jupyter y MLFlow server
+  - **Acceso**: S3-compatible storage accesible para MLFlow server
 
 - **images/**:
   - **Propósito**: Documentación visual del proyecto
@@ -67,7 +67,6 @@ requirements.txt
   - **Uso**: Soporte para README y documentación técnica
 - **locust/**:
   - **función**: alojar el .py que despliega la estructura de inferencia de locust 
-  **requirements**: librerías necesarias para desplegar locust
   - **Uso**: Soporte para README y documentación técnica
 
 **Configuración de orquestación:**
@@ -106,7 +105,7 @@ requirements.txt
 ### ¿Por qué esta configuración?
 
 **Problema original:**
-- Se requiere saber cual es la mínima capacidad necesaria para poder soportar 10000 usuarios haciendo request, de igual manera evaluar cómo la generación de réplicas puede optimizar el proceso, al ser el foco del taller, se buscó automatizar por completo el consumo del modelo para enfocarse en la optimización de request. Adicional, se busca consumir una imagen desde Dockerhub para el despliegue de la API
+- Se requiere saber cual es la mínima capacidad necesaria para poder soportar 10000 usuarios haciendo request realizando una carga incremental de 500 usuarios por segundo hasta los 10000, de igual manera evaluar cómo la generación de réplicas puede optimizar el proceso, al ser el foco del taller, se buscó automatizar por completo el consumo del modelo para enfocarse en la optimización de request. Adicional, se busca consumir una imagen desde Dockerhub para el despliegue de la API
 
 **Solución implementada:**
 - Se construyó la imagen del FastAPI y se subio a Dockerhub, una vez en Dockerhub se ajustó el docker compose para consumir esa imagen directamente y desplegar el servicio.Adicionalmente, se realizaron múltiples experimentos reduciendo la capacidad de los recursos que puede tomar el contenedor de FastAPI, posteriormente se generaron réplicas para evaluar el desempeño de la API.
