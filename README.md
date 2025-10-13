@@ -282,121 +282,31 @@ docker compose docker-compose-locust up
 
 ```python
 
-#Crea las tablas en MySQL
-
-import MySQLdb   # mysqlclient se importa como MySQLdb
-
-connection = MySQLdb.connect(
-    host="mysql",          # nombre del servicio en docker-compose
-    user="my_app_user",
-    passwd="my_app_pass",  # OJO: aquí se usa 'passwd' en lugar de 'password'
-    db="my_app_db",
-    port=3306
-)
-
-cursor = connection.cursor()
-
-# Ejecutar tus queries
-cursor.execute("DROP TABLE IF EXISTS penguins_raw;")
-cursor.execute("""
-CREATE TABLE penguins_raw (
-    species VARCHAR(50) NULL,
-    island VARCHAR(50) NULL,
-    bill_length_mm DOUBLE NULL,
-    bill_depth_mm DOUBLE NULL,
-    flipper_length_mm DOUBLE NULL,
-    body_mass_g DOUBLE NULL,
-    sex VARCHAR(10) NULL,
-    year INT NULL
-);
-""")
-
-cursor.execute("DROP TABLE IF EXISTS penguins_clean;")
-cursor.execute("""
-CREATE TABLE penguins_clean (
-    species INT NULL,
-    bill_length_mm DOUBLE NULL,
-    bill_depth_mm DOUBLE NULL,
-    flipper_length_mm DOUBLE NULL,
-    body_mass_g DOUBLE NULL,
-    year INT NULL,
-    island_Biscoe INT NULL,
-    island_Dream INT NULL,
-    island_Torgersen INT NULL,
-    sex_female INT NULL,
-    sex_male INT NULL
-);
-""")
-
-
-connection.commit()
-connection.close()
-
-#Inserta la información cruda 
-
-import palmerpenguins as pp
-from palmerpenguins import load_penguins
+import numpy as np 
+import mlflow
+import mlflow.sklearn
 import pandas as pd
-"""
-Función para insertar datos en la tabla MySQL
-"""
-TABLE_NAME = "penguins_raw"
-df = pp.load_penguins()
-
-
-connection = MySQLdb.connect(
-    host="mysql",          # nombre del servicio en docker-compose
-    user="my_app_user",
-    passwd="my_app_pass",  # OJO: aquí se usa 'passwd' en lugar de 'password'
-    db="my_app_db",
-    port=3306
-)
-
-cursor = connection.cursor()
-
-for _, row in df.iterrows():
-    sql = f"""
-    INSERT INTO {TABLE_NAME} 
-    (species, island, bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g, sex, year)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-    """
-    values = (
-        row["species"],
-        row["island"],
-        None if pd.isna(row["bill_length_mm"]) else float(row["bill_length_mm"]),
-        None if pd.isna(row["bill_depth_mm"]) else float(row["bill_depth_mm"]),
-        None if pd.isna(row["flipper_length_mm"]) else float(row["flipper_length_mm"]),
-        None if pd.isna(row["body_mass_g"]) else float(row["body_mass_g"]),
-        row["sex"] if pd.notna(row["sex"]) else None,
-        int(row["year"]),
-    )
-    
-    cursor.execute(sql, values)
-
-connection.commit()
-connection.close()
-
-
-#Trae la información desde MySQL
-conn = MySQLdb.connect(
-    host="mysql",          # nombre del servicio en docker-compose
-    user="my_app_user",
-    passwd="my_app_pass",  # OJO: aquí se usa 'passwd' en lugar de 'password'
-    db="my_app_db",
-    port=3306
-)
-
-query = "SELECT * FROM penguins_raw"
-df = pd.read_sql(query, conn)
-
-#Limpia los datos 
-
 from sklearn.preprocessing import OneHotEncoder
-import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+import palmerpenguins as pp
+from sklearn.linear_model import LogisticRegression
+from mlflow.tracking import MlflowClient
+import os
+import time
 
-df[df.isna().any(axis=1)]
+# Esperar un poco para asegurar que MLflow esté completamente listo
+time.sleep(10)
+
+# ============================================================
+# 1. Cargar y preparar los datos
+# ============================================================
+print("Cargando datos de penguins...")
+df = pp.load_penguins()
 df.dropna(inplace=True)
-categorical_cols = ['sex','island']
+
+# Codificar variables categóricas
+categorical_cols = ['sex', 'island']
 encoder = OneHotEncoder(handle_unknown='ignore')
 x = df.drop(columns=['species'])
 y = df['species']
@@ -404,233 +314,197 @@ x_encoded = encoder.fit_transform(x[categorical_cols])
 X_numeric = x.drop(columns=categorical_cols)
 X_final = np.hstack((X_numeric.values, x_encoded.toarray()))
 
-df_encoded = pd.get_dummies(df, columns=['island','sex'])
+# Codificación simple con pandas (opcional, más legible)
+df_encoded = pd.get_dummies(df, columns=['island', 'sex'])
 bool_cols = df_encoded.select_dtypes(include='bool').columns
 df_encoded[bool_cols] = df_encoded[bool_cols].astype(int)
-df_encoded.head()
-df_encoded['species'] = df_encoded['species'].apply(lambda x: 
-                        1 if x == 'Adelie' else 
-                        2 if x == 'Chinstrap' else 
-                        3 if x == 'Gentoo' else 
-                        None)
-# Inserta la información limpia en MySQL
-TABLE_NAME = "penguins_clean"
+df_encoded['species'] = df_encoded['species'].apply(lambda x:
+                        1 if x == 'Adelie' else
+                        2 if x == 'Chinstrap' else
+                        3 if x == 'Gentoo' else None)
 
-connection = MySQLdb.connect(
-    host="mysql",          # nombre del servicio en docker-compose
-    user="my_app_user",
-    passwd="my_app_pass",  # OJO: aquí se usa 'passwd' en lugar de 'password'
-    db="my_app_db",
-    port=3306
-)
+# ============================================================
+# 2. Configurar MLflow
+# ============================================================
+mlflow_uri = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000")
+print(f" Conectando a MLflow en {mlflow_uri}")
+mlflow.set_tracking_uri(mlflow_uri)
+mlflow.set_experiment("experimento")
 
-cursor = connection.cursor()
-
-insert_sql = """
-    INSERT INTO penguins_clean (
-        species, bill_length_mm, bill_depth_mm, flipper_length_mm, 
-        body_mass_g, year, island_Biscoe, island_Dream, island_Torgersen, 
-        sex_female, sex_male
-    )
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-"""
-
-# Genera los valores a insertar
-values = [
-    (
-        int(row["species"]),
-        None if pd.isna(row["bill_length_mm"]) else float(row["bill_length_mm"]),
-        None if pd.isna(row["bill_depth_mm"]) else float(row["bill_depth_mm"]),
-        None if pd.isna(row["flipper_length_mm"]) else float(row["flipper_length_mm"]),
-        None if pd.isna(row["body_mass_g"]) else float(row["body_mass_g"]),
-        int(row["year"]),
-        int(row["island_Biscoe"]),
-        int(row["island_Dream"]),
-        int(row["island_Torgersen"]),
-        int(row["sex_female"]),
-        int(row["sex_male"]),
-    )
-    for _, row in df_encoded.iterrows()
-]
-
-# Inserta múltiples filas
-cursor.executemany(insert_sql, values)
-
-# Confirma los cambios
-connection.commit()
-
-# Cierra conexión
-cursor.close()
-connection.close()
-
-#Trae la data limpia para entrenar el modelo
-conn = MySQLdb.connect(
-    host="mysql",          # nombre del servicio en docker-compose
-    user="my_app_user",
-    passwd="my_app_pass",  # OJO: aquí se usa 'passwd' en lugar de 'password'
-    db="my_app_db",
-    port=3306
-)
-
-query = "SELECT * FROM penguins_clean"
-df_limpio = pd.read_sql(query, conn)
-
-#Trae la data limpia para entrenar el modelo
-conn = MySQLdb.connect(
-    host="mysql",          # nombre del servicio en docker-compose
-    user="my_app_user",
-    passwd="my_app_pass",  # OJO: aquí se usa 'passwd' en lugar de 'password'
-    db="my_app_db",
-    port=3306
-)
-
-query = "SELECT * FROM penguins_clean"
-df_limpio = pd.read_sql(query, conn)
-
-import mlflow
-import mlflow.sklearn
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
- 
-# Modelos
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
-from sklearn.svm import SVC
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.tree import DecisionTreeClassifier
- 
-# ==============================
-# 1. Conectar con tu MLflow server
-# ==============================
-mlflow.set_tracking_uri("http://10.43.100.83:5005")  # Ajusta según tu servidor MLflow
- 
-# ==============================
-# 2. Preparar dataset
-# ==============================
-df = df_limpio  # tu DataFrame limpio
+# ============================================================
+# 3. Entrenar el modelo
+# ============================================================
+print("🤖 Entrenando modelo...")
+df = df_encoded
 X = df.drop("species", axis=1)
 y = df["species"]
- 
+
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
- 
-# ==============================
-# 3. Definir modelos y sus hiperparámetros
-# ==============================
-model_params = {
-    "logistic_regression": {
-        "model": LogisticRegression,
-        "params": [
-            {"C": 0.1, "max_iter": 5000, "solver": "lbfgs"},
-            {"C": 1, "max_iter": 5000, "solver": "lbfgs"},
-            {"C": 10, "max_iter": 5000, "solver": "lbfgs"}
-        ]
-    },
-    "random_forest": {
-        "model": RandomForestClassifier,
-        "params": [
-            {"n_estimators": 50, "max_depth": 5, "random_state": 42},
-            {"n_estimators": 100, "max_depth": 10, "random_state": 42},
-            {"n_estimators": 200, "max_depth": None, "random_state": 42},
-        ]
-    },
-    "gradient_boosting": {
-        "model": GradientBoostingClassifier,
-        "params": [
-            {"n_estimators": 50, "learning_rate": 0.1, "max_depth": 3},
-            {"n_estimators": 100, "learning_rate": 0.05, "max_depth": 3},
-            {"n_estimators": 150, "learning_rate": 0.01, "max_depth": 4},
-        ]
-    },
-    "adaboost": {
-        "model": AdaBoostClassifier,
-        "params": [
-            {"n_estimators": 50, "learning_rate": 0.5},
-            {"n_estimators": 100, "learning_rate": 1.0},
-            {"n_estimators": 150, "learning_rate": 1.5},
-        ]
-    },
-    "svc": {
-        "model": SVC,
-        "params": [
-            {"C": 0.1, "kernel": "linear", "probability": True},
-            {"C": 1, "kernel": "rbf", "probability": True},
-            {"C": 10, "kernel": "poly", "probability": True},
-        ]
-    },
-    "knn": {
-        "model": KNeighborsClassifier,
-        "params": [
-            {"n_neighbors": 3, "weights": "uniform"},
-            {"n_neighbors": 5, "weights": "distance"},
-            {"n_neighbors": 7, "weights": "uniform"},
-        ]
-    },
-    "decision_tree": {
-        "model": DecisionTreeClassifier,
-        "params": [
-            {"max_depth": 3, "min_samples_split": 2},
-            {"max_depth": 5, "min_samples_split": 4},
-            {"max_depth": None, "min_samples_split": 2},
-        ]
-    }
-}
- 
-# ==============================
-# 4. Entrenar y loggear cada experimento por separado
-# ==============================
-for model_name, mp in model_params.items():
-    ModelClass = mp["model"]
-    for i, params in enumerate(mp["params"]):
-        # Crear un experimento único por combinación
-        experiment_name = f"{model_name}_exp_{i+1}"
-        mlflow.set_experiment(experiment_name)  # crea o selecciona el experimento
- 
-        with mlflow.start_run(run_name=f"{model_name}_run") as run:
-            # Entrenar modelo
-            model = ModelClass(**params)
-            model.fit(X_train, y_train)
-            y_pred = model.predict(X_test)
-            acc = accuracy_score(y_test, y_pred)
- 
-            # Log de métricas
-            mlflow.log_metric("accuracy", acc)
- 
-            # Log de hiperparámetros
-            for k, v in params.items():
-                mlflow.log_param(k, v)
- 
-            # Log del modelo como artifact
-            mlflow.sklearn.log_model(sk_model=model, artifact_path="model")
- 
-            # Registrar en Model Registry
-            model_uri = f"runs:/{run.info.run_id}/model"
-            mlflow.register_model(model_uri=model_uri, name=f"{model_name}_model")
- 
-            print(f"{experiment_name} entrenado y logueado con accuracy: {acc}")
 
-#Pasa el modelo a producción
+model = LogisticRegression(max_iter=5000)
+model.fit(X_train, y_train)
 
-from mlflow.tracking import MlflowClient
+# ============================================================
+# 4. Loguear y registrar el modelo en MLflow
+# ============================================================
+print("Registrando modelo en MLflow...")
+with mlflow.start_run(run_name="logistic_regression_run") as run:
+    # Registrar métricas
+    y_pred = model.predict(X_test)
+    acc = accuracy_score(y_test, y_pred)
+    mlflow.log_metric("accuracy", acc)
 
-# Conexión al server
-mlflow.set_tracking_uri("http://10.43.100.98:5005")
+    # Log del modelo
+    mlflow.sklearn.log_model(
+        sk_model=model,
+        artifact_path="model",
+        input_example=X_test.head(1),  # ejemplo de entrada
+        registered_model_name="reg_logistica"  # nombre del modelo en el registry
+    )
+
+    print(f"Modelo logueado con accuracy = {acc:.4f}")
+
+# ============================================================
+# 5. Promover el modelo a Producción
+# ============================================================
+print("Promoviendo modelo a Production...")
 client = MlflowClient()
 
-# Actualizar a producción
 model_name = "reg_logistica"
 model_version = 1  # la primera versión que acabas de crear
 
-client.transition_model_version_stage(
-    name=model_name,
-    version=model_version,
-    stage="Production",
-    archive_existing_versions=True  # mueve versiones anteriores a Archived
+try:
+    client.transition_model_version_stage(
+        name=model_name,
+        version=model_version,
+        stage="Production",
+        archive_existing_versions=True  # mueve versiones anteriores a Archived
+    )
+    print(f" Modelo {model_name} v{model_version} promovido a Production")
+except Exception as e:
+    print(f" Error al promover modelo: {e}")
+
+print("🎉 ¡Proceso completado exitosamente!")
+
+```
+**Fast API Optimizado**
+```python
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+import pandas as pd
+import logging
+import os
+import mlflow
+import time
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+app = FastAPI(
+    title="Penguins Species Prediction API",
+    description="API optimizada para alta concurrencia",
+    version="3.0.0"
 )
 
-print(f"Modelo {model_name} v{model_version} promovido a Production")
+# Variables globales
+model = None
+model_loaded_at = None
+species_mapping = {1: "Adelie", 2: "Chinstrap", 3: "Gentoo"}
 
+class PenguinFeatures(BaseModel):
+    bill_length_mm: float = Field(..., example=39.1, ge=0)
+    bill_depth_mm: float = Field(..., example=18.7, ge=0)
+    flipper_length_mm: float = Field(..., example=181.0, ge=0)
+    body_mass_g: float = Field(..., example=3750.0, ge=0)
+    year: int = Field(..., example=2007, ge=0)
+    island_Biscoe: int = Field(0, example=0, ge=0)
+    island_Dream: int = Field(0, example=0, ge=0)  
+    island_Torgersen: int = Field(1, example=1, ge=0)
+    sex_female: int = Field(0, example=0, ge=0)
+    sex_male: int = Field(1, example=1, ge=0)
+
+@app.on_event("startup")
+async def load_model():
+    global model, model_loaded_at
+    try:
+        logger.info("Iniciando carga del modelo...")
+        
+        # Configuración MLflow
+        os.environ["MLFLOW_S3_ENDPOINT_URL"] = os.getenv("MLFLOW_S3_ENDPOINT_URL", "http://minio:9000")
+        os.environ["AWS_ACCESS_KEY_ID"] = os.getenv("AWS_ACCESS_KEY_ID", "admin")
+        os.environ["AWS_SECRET_ACCESS_KEY"] = os.getenv("AWS_SECRET_ACCESS_KEY", "supersecret")
+        mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5008"))
+        
+        MODEL_NAME = "reg_logistica"
+        MODEL_STAGE = "Production"
+        model_uri = f"models:/{MODEL_NAME}/{MODEL_STAGE}"
+        
+        logger.info(f"Descargando modelo desde: {model_uri}")
+        model = mlflow.pyfunc.load_model(model_uri)
+        model_loaded_at = time.time()
+        
+        logger.info(f"Modelo cargado en memoria. Tipo: {type(model).__name__}")
+        
+        # Test de predicción
+        test_data = pd.DataFrame([{
+            "bill_length_mm": 39.1,
+            "bill_depth_mm": 18.7,
+            "flipper_length_mm": 181.0,
+            "body_mass_g": 3750.0,
+            "year": 2007,
+            "island_Biscoe": 0,
+            "island_Dream": 0,
+            "island_Torgersen": 1,
+            "sex_female": 0,
+            "sex_male": 1
+        }])
+        test_pred = model.predict(test_data)[0]
+        logger.info(f"Test de predicción: {test_pred} ({species_mapping.get(int(test_pred), 'Unknown')})")
+        
+    except Exception as e:
+        logger.error(f" Error cargando modelo: {e}")
+        raise e
+
+@app.post("/predict")
+def predict(features: PenguinFeatures):
+    if model is None:
+        raise HTTPException(status_code=503, detail="Modelo no disponible")
+    
+    try:
+        # Convertir a DataFrame (compatible con pyfunc)
+        feature_df = pd.DataFrame([features.dict()])
+        prediction = model.predict(feature_df)[0]
+        
+        return {
+            "species_id": int(prediction),
+            "species_name": species_mapping.get(int(prediction), "Unknown"),
+            "latency_ms": "<10ms",
+            "model_source": "In-Memory Cache"
+        }
+    except Exception as e:
+        logger.error(f" Error en predicción: {e}")
+        raise HTTPException(status_code=400, detail=f"Error: {str(e)}")
+
+@app.get("/health")
+def health():
+    return {
+        "status": "healthy",
+        "model_loaded": model is not None,
+        "model_loaded_at": model_loaded_at
+    }
+
+@app.get("/model-info")
+def model_info():
+    if model is None:
+        raise HTTPException(status_code=503, detail="Modelo no disponible")
+    return {
+        "model_type": str(type(model).__name__),
+        "model_loaded": True,
+        "model_in_memory": True,
+        "description": "Modelo cacheado en memoria - predicciones instantáneas sin overhead de MLflow"
+    }
 ```
 
 
