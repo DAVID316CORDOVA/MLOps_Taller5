@@ -260,8 +260,8 @@ docker compose docker-compose-locust up
 ### 2.Evaluación de Recursos Disponibles para los Experimentos
 **Resultados:**
 
-![Memoria RAM](./imagenes/free-h.png)
-![CPU Info](./imagenes/lscpu.png)
+![Memoria RAM](./imagenes/free-h.PNG)
+![CPU Info](./imagenes/lscpu.PNG)
 
 **Resumen:**
 - Memoria RAM: 15 GiB  
