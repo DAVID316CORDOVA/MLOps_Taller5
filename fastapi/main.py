@@ -36,7 +36,7 @@ class PenguinFeatures(BaseModel):
 async def load_model():
     global model, model_loaded_at
     try:
-        logger.info("🔄 Iniciando carga del modelo...")
+        logger.info("Iniciando carga del modelo...")
         
         # Configuración MLflow
         os.environ["MLFLOW_S3_ENDPOINT_URL"] = os.getenv("MLFLOW_S3_ENDPOINT_URL", "http://minio:9000")
@@ -52,7 +52,7 @@ async def load_model():
         model = mlflow.pyfunc.load_model(model_uri)
         model_loaded_at = time.time()
         
-        logger.info(f"✅ Modelo cargado en memoria. Tipo: {type(model).__name__}")
+        logger.info(f"Modelo cargado en memoria. Tipo: {type(model).__name__}")
         
         # Test de predicción
         test_data = pd.DataFrame([{
@@ -68,10 +68,10 @@ async def load_model():
             "sex_male": 1
         }])
         test_pred = model.predict(test_data)[0]
-        logger.info(f"✅ Test de predicción: {test_pred} ({species_mapping.get(int(test_pred), 'Unknown')})")
+        logger.info(f"Test de predicción: {test_pred} ({species_mapping.get(int(test_pred), 'Unknown')})")
         
     except Exception as e:
-        logger.error(f"❌ Error cargando modelo: {e}")
+        logger.error(f" Error cargando modelo: {e}")
         raise e
 
 @app.post("/predict")
@@ -91,7 +91,7 @@ def predict(features: PenguinFeatures):
             "model_source": "In-Memory Cache"
         }
     except Exception as e:
-        logger.error(f"❌ Error en predicción: {e}")
+        logger.error(f"Error en predicción: {e}")
         raise HTTPException(status_code=400, detail=f"Error: {str(e)}")
 
 @app.get("/health")
