@@ -571,7 +571,9 @@ Múltiples réplicas: distribución de carga, menor latencia, mayor throughput, 
 
 ## Conclusiones
 
-El proyecto integró exitosamente un pipeline MLOps completo con MLflow, FastAPI y Locust, demostrando cómo la contenerización y el escalamiento horizontal mejoran el rendimiento y la resiliencia del sistema. Se identificó que con 0.5 CPU y 512 MB RAM por instancia y 3 réplicas, la API mantiene estabilidad y baja latencia, validando la eficiencia del enfoque MLOps aplicado.
+- El proyecto integró exitosamente un pipeline MLOps completo con MLflow, FastAPI y Locust, demostrando cómo la contenerización y el escalamiento horizontal mejoran el rendimiento y la resiliencia del sistema. 
+
+- Se identificó que con 0.5 CPU y 512 MB RAM por instancia y 3 réplicas, la API mantiene estabilidad y baja latencia, validando la eficiencia del enfoque MLOps aplicado.
 
 ---
 
