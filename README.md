@@ -270,39 +270,40 @@ docker compose docker-compose-locust up
 - Sistema operativo: Rocky Linux
 
 
-### Dado que la máquina virtual contaba con 15 GiB de RAM y 4 CPU, se realizaron pruebas variando los recursos asignados a los contenedores de FastAPI para evaluar el rendimiento del sistema bajo diferentes configuraciones.
+#### Dado que la máquina virtual contaba con 15 GiB de RAM y 4 CPU, se realizaron pruebas variando los recursos asignados a los contenedores de FastAPI para evaluar el rendimiento del sistema bajo diferentes configuraciones.
 
 
-### 2. Primera prueba con todos los recursos disponibles
+### 3. Primera prueba con todos los recursos disponibles
 ![Inicio del sistema](./imagenes/Recursos%20completos.jpg)
 
-### 3. 1ra disminución de recursos (2cpu 4ram)
+### 4. 1ra disminución de recursos (2cpu 4ram)
 ![Inicio del sistema](./imagenes/2cpu_4ram.png)
 
-## 4. 2da disminución de recursos (1.5cpu 3ram)
+## 5. 2da disminución de recursos (1.5cpu 3ram)
 ![Inicio del sistema](./imagenes/1_5_de_cpu_3_ram.png)
 
-## 5. 3ra disminución de recursos (1cpu 2ram) 
+## 6. 3ra disminución de recursos (1cpu 2ram) 
 ![Inicio del sistema](./imagenes/1_cpu_2_ram.png)
 
 
-## 6. 4ta disminución de recursos(0.75cpu 1ram)
+## 7. 4ta disminución de recursos(0.75cpu 1ram)
 ![Inicio del sistema](./imagenes/0_75_cpu_4_ram.png)
 
-## 7. 5ta disminución de recursos(0.75cpu 0.256ram) - Fallo
+## 8. 5ta disminución de recursos(0.75cpu 0.256ram) - Fallo
 ![Inicio del sistema](./imagenes/0_5_cpu_256mb_ram.png)
 
 
 ## Resumen resultados
-| Configuración     | RPS Máximo | RPS Promedio | Tiempo Resp. Avg (ms) | Tiempo Resp. P95 (ms) | Usuarios Máx | Fallas/s | Estado        |
-|------------------|------------|--------------|----------------------|----------------------|--------------|----------|---------------|
-| 0.5CPU - 0.256RAM | ~350       | ~100         | ~145,000             | ~220,000             | 10000        | 1,200+   | ❌ Colapsó    |
-| 0.5 CPU - 1RAM    | ~280       | ~240         | ~26,000              | ~37,000              | 10000        | 0        | ✅ Estable    |
-| 0.75CPU - 4RAM    | ~420       | ~360         | ~17,000              | ~24,000              | 10000        | 0        | ✅ Estable    |
-| 1.5 CPU - 3RAM    | ~490       | ~420         | ~16,000              | ~22,000              | 10000        | 0        | ✅ Estable    |
-| 1CPU - 2RAM       | ~470       | ~390         | ~20,000              | ~23,000              | 10000        | 0        | ✅ Estable    |
-| 2CPU - 4RAM       | ~450       | ~370         | ~18,000              | ~23,000              | 10000        | 0        | ✅ Estable    |
-| 4CPU - 16RAM      | ~370       | ~330         | ~8,500               | ~18,000              | 10000        | 0        | ✅ Óptimo     |
+| Configuración         | RPS Máximo | RPS Promedio | Tiempo Resp. Avg (ms) | Tiempo Resp. P95 (ms) | Usuarios Máx | Fallas/s | Estado      |
+|-----------------------|------------|--------------|----------------------|----------------------|--------------|----------|---------------|
+| 0.5CPU - 256 MB RAM   | ~350       | ~100         | ~145,000             | ~220,000             | 10000        | 1,200+   | ❌ Colapsó    |
+| 0.5 CPU - 512 MB RAM  | ~280       | ~240         | ~26,000              | ~37,000              | 10000        | 0        | ✅ Estable    |
+| 0.5 CPU - 1 GB RAM    | ~280       | ~240         | ~26,000              | ~37,000              | 10000        | 0        | ✅ Estable    |
+| 0.75CPU - 4 GB RAM    | ~420       | ~360         | ~17,000              | ~24,000              | 10000        | 0        | ✅ Estable    |
+| 1.5 CPU - 3 GB RAM    | ~490       | ~420         | ~16,000              | ~22,000              | 10000        | 0        | ✅ Estable    |
+| 1CPU - 2 GB RAM       | ~470       | ~390         | ~20,000              | ~23,000              | 10000        | 0        | ✅ Estable    |
+| 2CPU - 4 GB RAM       | ~450       | ~370         | ~18,000              | ~23,000              | 10000        | 0        | ✅ Estable    |
+| 4CPU - 16 GB RAM      | ~370       | ~330         | ~8,500               | ~18,000              | 10000        | 0        | ✅ Óptimo     |
 
 
 
