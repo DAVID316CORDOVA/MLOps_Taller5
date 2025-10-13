@@ -141,7 +141,7 @@ requirements.txt
 
 ```yaml
 # environment:
-      - LOCUST_HOST=http://10.43.100.98:8000
+      - LOCUST_HOST=http://fastapi:8000
 ```
 ## Flujo del Pipeline
 
