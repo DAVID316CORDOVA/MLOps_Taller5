@@ -546,7 +546,7 @@ def model_info():
     }
 ```
 
-## Comparación 1 instancia vs múltiples instancias 
+## Comparación 1 instancia vs múltiples instancias (mínimos recursos)
 
 ## 1 Instancia
 ![Inicio del sistema](./imagenes/0_5_cpu_512_ram.png)
