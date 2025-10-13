@@ -270,26 +270,30 @@ docker compose docker-compose-locust up
 - Sistema operativo: Rocky Linux
 
 
-#### Dado que la máquina virtual contaba con 15 GiB de RAM y 4 CPU, se realizaron pruebas variando los recursos asignados a los contenedores de FastAPI para evaluar el rendimiento del sistema bajo diferentes configuraciones.
+#### Dado que la máquina virtual contaba con 15 GB de RAM y 4 CPU, se realizaron pruebas variando los recursos asignados a los contenedores de FastAPI para evaluar el rendimiento del sistema bajo diferentes configuraciones.
 
 
 ### 3. Primera prueba con todos los recursos disponibles
 ![Inicio del sistema](./imagenes/Recursos%20completos.jpg)
 
-### 4. 1ra disminución de recursos (2cpu 4ram)
+### 4. 1ra disminución de recursos (2 CPU  - 4 GB RAM)
 ![Inicio del sistema](./imagenes/2cpu_4ram.png)
 
-## 5. 2da disminución de recursos (1.5cpu 3ram)
+## 5. 2da disminución de recursos (1.5 CPU - 3 GB RAM)
 ![Inicio del sistema](./imagenes/1_5_de_cpu_3_ram.png)
 
-## 6. 3ra disminución de recursos (1cpu 2ram) 
+## 6. 3ra disminución de recursos (1 CPU 2 GB RAM) 
 ![Inicio del sistema](./imagenes/1_cpu_2_ram.png)
 
 
-## 7. 4ta disminución de recursos(0.75cpu 1ram)
+## 7. 4ta disminución de recursos(0.75 CPU - 1 GB RAM)
 ![Inicio del sistema](./imagenes/0_75_cpu_4_ram.png)
 
-## 8. 5ta disminución de recursos(0.75cpu 0.256ram) - Fallo
+## 8. 5ta disminución de recursos(0.5 CPU - 512 MB RAM) 
+![Inicio del sistema](./imagenes/0_5_cpu_512mb_ram.png)
+
+
+## 9. 5ta disminución de recursos(0.5 CPU - 256 MB RAM) - Fallo
 ![Inicio del sistema](./imagenes/0_5_cpu_256mb_ram.png)
 
 
