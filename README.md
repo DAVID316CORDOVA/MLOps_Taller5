@@ -277,6 +277,19 @@ docker compose docker-compose-locust up
 ![Inicio del sistema](./imagenes/0_5_cpu_256mb_ram.png)
 
 
+## Resumen resultados
+| Configuración     | RPS Máximo | RPS Promedio | Tiempo Resp. Avg (ms) | Tiempo Resp. P95 (ms) | Usuarios Máx | Fallas/s | Estado        |
+|------------------|------------|--------------|----------------------|----------------------|--------------|----------|---------------|
+| 0.5CPU - 0.256RAM | ~350       | ~100         | ~145,000             | ~220,000             | 10000        | 1,200+   | ❌ Colapsó    |
+| 0.5 CPU - 1RAM    | ~280       | ~240         | ~26,000              | ~37,000              | 10000        | 0        | ✅ Estable    |
+| 0.75CPU - 4RAM    | ~420       | ~360         | ~17,000              | ~24,000              | 10000        | 0        | ✅ Estable    |
+| 1.5 CPU - 3RAM    | ~490       | ~420         | ~16,000              | ~22,000              | 10000        | 0        | ✅ Estable    |
+| 1CPU - 2RAM       | ~470       | ~390         | ~20,000              | ~23,000              | 10000        | 0        | ✅ Estable    |
+| 2CPU - 4RAM       | ~450       | ~370         | ~18,000              | ~23,000              | 10000        | 0        | ✅ Estable    |
+| 4CPU - 16RAM      | ~370       | ~330         | ~8,500               | ~18,000              | 10000        | 0        | ✅ Óptimo     |
+
+
+
 
 ### funciones notebook - Lógica del Pipeline
 
