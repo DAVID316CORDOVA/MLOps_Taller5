@@ -286,15 +286,15 @@ docker compose docker-compose-locust up
 ![Inicio del sistema](./imagenes/1_cpu_2_ram.png)
 
 
-## 7. 4ta disminución de recursos(0.75 CPU - 1 GB RAM)
+## 7. 4ta disminución de recursos(0.75 CPU - 1.5 GB RAM)
 ![Inicio del sistema](./imagenes/0_75_cpu_4_ram.png)
 
 ## 8. 5ta disminución de recursos(0.5 CPU - 512 MB RAM) 
-![Inicio del sistema](./imagenes/0_5_cpu_512mb_ram.png)
+![Inicio del sistema](./imagenes/0_5_cpu_512_ram.png)
 
 
 ## 9. 5ta disminución de recursos(0.5 CPU - 256 MB RAM) - Fallo
-![Inicio del sistema](./imagenes/0_5_cpu_256mb_ram.png)
+![Inicio del sistema](./imagenes/0_5_cpu_256_ram.png)
 
 
 ## Resumen resultados
