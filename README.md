@@ -27,7 +27,6 @@ fastapi/
 
 locust/
 ├── locustfile.py
-└── requirements-locust.txt
 
 minio/
 
@@ -35,8 +34,6 @@ ml-training/
 ├── Dockerfile
 ├── requirements.txt
 └── train_model.py
-
-mlflow/
 
 register_model/
 ├── RegresionLogistica.pkl
@@ -293,21 +290,21 @@ docker compose docker-compose-locust up
 ![Inicio del sistema](./imagenes/0_5_cpu_512_ram.png)
 
 
-## 9. 5ta disminución de recursos(0.5 CPU - 256 MB RAM) - Fallo
+## 9. 6ta disminución de recursos(0.5 CPU - 256 MB RAM) - Fallo
 ![Inicio del sistema](./imagenes/0_5_cpu_256_ram.png)
 
 
 ## Resumen resultados
-| Configuración         | RPS Máximo | RPS Promedio | Tiempo Resp. Avg (ms) | Tiempo Resp. P95 (ms) | Usuarios Máx | Fallas/s | Estado      |
-|-----------------------|------------|--------------|----------------------|----------------------|--------------|----------|---------------|
-| 0.5CPU - 256 MB RAM   | ~350       | ~100         | ~145,000             | ~220,000             | 10000        | 1,200+   | ❌ Colapsó    |
-| 0.5 CPU - 512 MB RAM  | ~280       | ~240         | ~26,000              | ~37,000              | 10000        | 0        | ✅ Estable    |
-| 0.5 CPU - 1 GB RAM    | ~280       | ~240         | ~26,000              | ~37,000              | 10000        | 0        | ✅ Estable    |
-| 0.75CPU - 4 GB RAM    | ~420       | ~360         | ~17,000              | ~24,000              | 10000        | 0        | ✅ Estable    |
-| 1.5 CPU - 3 GB RAM    | ~490       | ~420         | ~16,000              | ~22,000              | 10000        | 0        | ✅ Estable    |
-| 1CPU - 2 GB RAM       | ~470       | ~390         | ~20,000              | ~23,000              | 10000        | 0        | ✅ Estable    |
-| 2CPU - 4 GB RAM       | ~450       | ~370         | ~18,000              | ~23,000              | 10000        | 0        | ✅ Estable    |
-| 4CPU - 16 GB RAM      | ~370       | ~330         | ~8,500               | ~18,000              | 10000        | 0        | ✅ Óptimo     |
+| Configuración         | RPS Máximo | RPS Promedio | Tiempo Resp. Avg (ms) | Tiempo Resp. P95 (ms) | Usuarios Máx | Fallas/s | Estado   |
+|-----------------------|------------|--------------|----------------------|----------------------|--------------|----------|------------|
+| 0.5CPU - 256 MB RAM   | ~350       | ~100         | ~145,000             | ~220,000             | 10000        | 1,200+   | Colapsó    |
+| 0.5 CPU - 512 MB RAM  | ~300       | ~220         | ~26,000              | ~37,000              | 10000        | 0        | Estable    |
+| 0.5 CPU - 1 GB RAM    | ~280       | ~240         | ~26,000              | ~37,000              | 10000        | 0        | Estable    |
+| 0.75 CPU - 1.5 GB RAM | ~420       | ~360         | ~17,000              | ~24,000              | 10000        | 0        | Estable    |
+| 1.5 CPU - 3 GB RAM    | ~490       | ~420         | ~16,000              | ~22,000              | 10000        | 0        | Estable    |
+| 1 CPU - 2 GB RAM      | ~470       | ~390         | ~20,000              | ~23,000              | 10000        | 0        | Estable    |
+| 2 CPU - 4 GB RAM      | ~450       | ~370         | ~18,000              | ~23,000              | 10000        | 0        | Estable    |
+| 4 CPU - 16 GB RAM     | ~370       | ~330         | ~8,500               | ~18,000              | 10000        | 0        | Óptimo     |
 
 
 
@@ -368,7 +365,7 @@ mlflow.set_experiment("experimento")
 # ============================================================
 # 3. Entrenar el modelo
 # ============================================================
-print("🤖 Entrenando modelo...")
+print("Entrenando modelo...")
 df = df_encoded
 X = df.drop("species", axis=1)
 y = df["species"]
@@ -420,7 +417,7 @@ try:
 except Exception as e:
     print(f" Error al promover modelo: {e}")
 
-print("🎉 ¡Proceso completado exitosamente!")
+print("¡Proceso completado exitosamente!")
 
 ```
 **Fast API Optimizado**
