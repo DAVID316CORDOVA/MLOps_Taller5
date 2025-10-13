@@ -41,6 +41,7 @@ register_model/
 
 docker-compose-locust.yaml
 docker-compose.yaml
+docker-compose-replicas.yaml
 RegresionLogistica.pkl
 requirements.txt
 ```
@@ -77,6 +78,14 @@ requirements.txt
   - **Volúmenes persistentes**: postgres_data para persistencia
   - **Variables de entorno**: Configuración S3, credenciales y URIs de conexión
   - **Dependencias**: Orden de inicio optimizado para disponibilidad de servicios
+ 
+- **docker-compose-replicas.yaml**:
+  - **Servicios gestionados**: MinIO, Postgres, FastAPI, Mlflow
+  - **Networking**: Red interna para comunicación inter-servicios
+  - **Volúmenes persistentes**: postgres_data para persistencia
+  - **Variables de entorno**: Configuración S3, credenciales y URIs de conexión
+  - **Dependencias**: Orden de inicio optimizado para disponibilidad de servicios
+  - **observaciones**: Se generó un compose nuevo para hacer las pruebas de múltiples instancias
 
   - **docker-compose-locust.yaml**:
   - **Servicios gestionados**:locust
@@ -563,19 +572,7 @@ Múltiples réplicas: distribución de carga, menor latencia, mayor throughput, 
 
 ## Conclusiones
 
-Conclusiones
-
-La implementación realizada demuestra cómo integrar de manera efectiva distintos servicios (MySQL, Postgres, MinIO, Jupyter, FastAPI y MLflow) en un entorno contenerizado con Docker Compose, logrando un flujo completo de MLOps.
-
-Se logró establecer un pipeline automatizado que cubre todas las etapas: ingesta de datos, limpieza, entrenamiento, experimentación, registro de modelos, despliegue y consumo en producción.
-
-El uso de MLflow con backend en Postgres y artefactos en MinIO garantiza trazabilidad, persistencia y escalabilidad en comparación con la configuración por defecto en SQLite.
-
-La conexión entre FastAPI y MLflow permite consumir modelos directamente desde el registro, habilitando predicciones en tiempo real y demostrando un caso de uso cercano a un escenario de producción.
-
-El notebook desarrollado constituye un ejemplo reproducible de todo el flujo de trabajo, desde la preparación de la base de datos hasta la promoción de un modelo en producción, lo que refuerza la importancia de la automatización y reproducibilidad en proyectos de ciencia de datos.
-
-En general, este proyecto evidencia la viabilidad y relevancia de aplicar prácticas de MLOps en entornos académicos y profesionales, sirviendo como base para escalar a soluciones más complejas en el futuro.
+El proyecto integró exitosamente un pipeline MLOps completo con MLflow, FastAPI y Locust, demostrando cómo la contenerización y el escalamiento horizontal mejoran el rendimiento y la resiliencia del sistema. Se identificó que con 0.5 CPU y 512 MB RAM por instancia y 3 réplicas, la API mantiene estabilidad y baja latencia, validando la eficiencia del enfoque MLOps aplicado.
 
 ---
 
