@@ -298,7 +298,7 @@ docker compose docker-compose-locust up
 | Configuración         | RPS Máximo | RPS Promedio | Tiempo Resp. Avg (ms) | Tiempo Resp. P95 (ms) | Usuarios Máx | Fallas/s | Estado   |
 |-----------------------|------------|--------------|----------------------|----------------------|--------------|----------|------------|
 | 0.5CPU - 256 MB RAM   | ~350       | ~100         | ~145,000             | ~220,000             | 10000        | 1,200+   | Colapsó    |
-| 0.5 CPU - 512 MB RAM  | ~300       | ~220         | ~26,000              | ~37,000              | 10000        | 0        | Estable    |
+| 0.5 CPU - 512 MB RAM  | ~300       | ~220         | ~48,000              | ~48,000              | 10000        | 0        | Estable    |
 | 0.5 CPU - 1 GB RAM    | ~280       | ~240         | ~26,000              | ~37,000              | 10000        | 0        | Estable    |
 | 0.75 CPU - 1.5 GB RAM | ~420       | ~360         | ~17,000              | ~24,000              | 10000        | 0        | Estable    |
 | 1.5 CPU - 3 GB RAM    | ~490       | ~420         | ~16,000              | ~22,000              | 10000        | 0        | Estable    |
@@ -309,7 +309,7 @@ docker compose docker-compose-locust up
 
 
 
-### funciones notebook - Lógica del Pipeline
+### Código para la lectura,limpieza y transformación de datos y para el entrenamiento del modelo de Regresión Logística
 
 ```python
 
