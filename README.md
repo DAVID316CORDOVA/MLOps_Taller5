@@ -270,7 +270,7 @@ docker compose docker-compose-locust up
 - Sistema operativo: Rocky Linux
 
 
-
+### Dado que la máquina virtual contaba con 15 GiB de RAM y 4 CPU, se realizaron pruebas variando los recursos asignados a los contenedores de FastAPI para evaluar el rendimiento del sistema bajo diferentes configuraciones.
 
 
 ### 2. Primera prueba con todos los recursos disponibles
