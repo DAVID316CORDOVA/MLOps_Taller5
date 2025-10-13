@@ -108,7 +108,7 @@ requirements.txt
 - Se requiere saber cual es la mínima capacidad necesaria para poder soportar 10000 usuarios haciendo request realizando una carga incremental de 500 usuarios por segundo hasta los 10000, de igual manera evaluar cómo la generación de réplicas puede optimizar el proceso, al ser el foco del taller, se buscó automatizar por completo el consumo del modelo para enfocarse en la optimización de request. Adicional, se busca consumir una imagen desde Dockerhub para el despliegue de la API
 
 **Solución implementada:**
-- Se construyó la imagen del FastAPI y se subio a Dockerhub, una vez en Dockerhub se ajustó el docker compose para consumir esa imagen directamente y desplegar el servicio.Adicionalmente, se realizaron múltiples experimentos reduciendo la capacidad de los recursos que puede tomar el contenedor de FastAPI, posteriormente se generaron réplicas para evaluar el desempeño de la API.
+- Se construyó la imagen del FastAPI y se subio a Docker Hub, una vez en Docker Hub se ajustó el docker compose para consumir esa imagen directamente y desplegar el servicio. Adicionalmente, se realizaron múltiples experimentos reduciendo la capacidad de los recursos que puede tomar el contenedor de FastAPI, posteriormente se generaron réplicas para evaluar el desempeño de la API.
 
 ### Componentes de Configuración
 
@@ -147,11 +147,12 @@ requirements.txt
 ### Secuencia de Ejecución:
 
 1. docker compose up
-2. Servicios iniciando (Minio+ Postgres + MlFlow + Fastapi + Python Env)
-3. docker compose docker-compose-locust up
+2. Servicios iniciando (Minio+ Postgres + MlFlow + Fastapi + Python Env).
+3. docker compose -f docker-compose-locust.yaml up.
 4. Servicio de Locust iniciado.
-5. Definir parámetros de pruebas de estres 
-6. Realizar pruebas de estres reduciendo capacidad hasta llegar al mínimo posible 
+5. Definir parámetros de pruebas de estres.
+6. Realizar pruebas de estres reduciendo capacidad hasta llegar al mínimo posible.
+7. Comparar el desempeño entre el despliegue de 1 réplica y varias usando el docker-compose-replicas.yaml
 
 
 ## Explicación train_model-py (ejecucion.py)
@@ -564,7 +565,7 @@ Con 3 réplicas se alcanzaron alrededor de 600 RPS estables y 10.000 usuarios co
 
 ## ¿Qué diferencia hay entre una o múltiples instancias?
 Una réplica: menor rendimiento, alta latencia, saturación rápida.
-Múltiples réplicas: distribución de carga, menor latencia, mayor throughput, mejor escalabilidad.
+Múltiples réplicas: distribución de carga, menor latencia y mejor escalabilidad.
 
 
 
@@ -572,7 +573,9 @@ Múltiples réplicas: distribución de carga, menor latencia, mayor throughput, 
 
 - El proyecto integró exitosamente un pipeline MLOps completo con MLflow, FastAPI y Locust, demostrando cómo la contenerización y el escalamiento horizontal mejoran el rendimiento y la resiliencia del sistema. 
 
-- Se identificó que con 0.5 CPU y 512 MB RAM por instancia y 3 réplicas, la API mantiene estabilidad y baja latencia, validando la eficiencia del enfoque MLOps aplicado.
+- Se encontró que con 0.5 CPU y 512MB de RAM el proceso es estable y logra soportar un tráfico de 10000 request con un incremento de 500 request por segundo.
+
+- Se identificó que con 0.5 CPU y 512 MB RAM por instancia y 3 réplicas, la API mantiene estabilidad y baja latencia, validando la eficiencia del enfoque MLOps aplicado y mostrando una mejor capacidad de respuesta que con 1 sola instancia desplegada.
 
 ---
 
