@@ -48,7 +48,7 @@ async def load_model():
         MODEL_STAGE = "Production"
         model_uri = f"models:/{MODEL_NAME}/{MODEL_STAGE}"
         
-        logger.info(f"⬇️ Descargando modelo desde: {model_uri}")
+        logger.info(f"Descargando modelo desde: {model_uri}")
         model = mlflow.pyfunc.load_model(model_uri)
         model_loaded_at = time.time()
         
@@ -110,5 +110,5 @@ def model_info():
         "model_type": str(type(model).__name__),
         "model_loaded": True,
         "model_in_memory": True,
-        "description": "Modelo cacheado en memoria - predicciones instantáneas sin overhead de MLflow"
+        "description": "Modelo cacheado en memoria"
     }
