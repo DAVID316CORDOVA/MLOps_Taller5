@@ -174,7 +174,6 @@ Este script tiene todo el flujo correspondiente a la ingesta de información, en
 
 **Configuración FastAPI**
 
-Framework: FastAPI v3.0.0
 Propósito: Predecir especies de pingüinos (Adelie, Chinstrap, Gentoo)
 Optimizado para baja latencia y alta concurrencia
 
