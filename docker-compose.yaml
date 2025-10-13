@@ -102,7 +102,7 @@ services:
         condition: service_healthy
     command: python train_model.py
   fastapi:
-    # image: spartron12/fastapi-ml:latest   # tu imagen publicada en Docker Hub
+    image: spartron12/fastapi-ml:latest  
     build:
       context: ./fastapi
       dockerfile: Dockerfile
