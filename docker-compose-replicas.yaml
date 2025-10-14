@@ -128,8 +128,8 @@ services:
       
       resources:
         limits:
-          cpus: '0.5'        # Inicio: 2 CPUs (50% de tu VM)
-          memory: 512M       # Inicio: 4GB RAM (25% de tu VM)
+          cpus: '0.5'        
+          memory: 512M      
         reservations:
           cpus: '0.25'
           memory: 256M
